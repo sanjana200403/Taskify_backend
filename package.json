@@ -1,0 +1,43 @@
+{
+  "name": "altera-todo-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write src tests eslint.config.js vitest.config.js",
+    "format:check": "prettier --check src tests eslint.config.js vitest.config.js",
+    "check": "npm run lint && npm run test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "mongodb-memory-server": "^10.1.4",
+    "prettier": "^3.9.10",
+    "supertest": "^7.0.0",
+    "vitest": "^5.1.0"
+  }
+}
