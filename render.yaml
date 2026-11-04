@@ -2,6 +2,7 @@ services:
   - type: web
     name: task-manager-api
     runtime: node
+    plan: free
     region: singapore
     buildCommand: npm ci
     startCommand: npm start
