@@ -328,4 +328,4 @@ The tests cover authentication, password hashing, validation, CSRF, task CRUD, k
 5. Deploy the API over HTTPS so secure cross-site cookies work.
 6. Use `/api/health` as the hosting platform's health-check path.
 
-The repository includes a root `render.yaml` for API deployment. Netlify can host the frontend while this Express API can be hosted on Render or another Node.js service.
+The repository includes a root `render.yaml` for API deployment.
