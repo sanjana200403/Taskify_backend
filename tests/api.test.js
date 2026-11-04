@@ -93,6 +93,30 @@ describe("authentication", () => {
 });
 
 describe("user-scoped task API", () => {
+  it("lists open tasks before completed tasks and keeps each group newest first", async () => {
+    const agent = request.agent(app);
+    const { csrf } = await register(agent);
+    const task = (title, status) => ({
+      title,
+      status,
+      scheduledAt: "2026-11-04T09:30:00.000Z",
+      priority: "Medium",
+    });
+
+    await agent.post("/api/tasks").set("x-csrf-token", csrf).send(task("Older open task", "Pending"));
+    await agent.post("/api/tasks").set("x-csrf-token", csrf).send(task("Completed task", "Completed"));
+    await agent.post("/api/tasks").set("x-csrf-token", csrf).send(task("Newest open task", "In Progress"));
+
+    const listed = await agent.get("/api/tasks?sort=activeNewest");
+
+    expect(listed.status).toBe(200);
+    expect(listed.body.data.map(({ title }) => title)).toEqual([
+      "Newest open task",
+      "Older open task",
+      "Completed task",
+    ]);
+  });
+
   it("creates, reads, edits, searches, summarizes, and deletes a task", async () => {
     const agent = request.agent(app);
     const { csrf } = await register(agent);

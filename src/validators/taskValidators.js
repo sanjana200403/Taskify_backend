@@ -54,7 +54,10 @@ export const paginationValidation = [
     .trim()
     .isLength({ min: 1, max: 120 })
     .withMessage("Search must be between 1 and 120 characters"),
-  query("sort").optional().isIn(["dueAsc", "dueDesc", "newest"]).withMessage("Invalid sort order"),
+  query("sort")
+    .optional()
+    .isIn(["activeNewest", "dueAsc", "dueDesc", "newest"])
+    .withMessage("Invalid sort order"),
   query("from").optional().isISO8601().withMessage("Invalid from date"),
   query("to").optional().isISO8601().withMessage("Invalid to date"),
 ];

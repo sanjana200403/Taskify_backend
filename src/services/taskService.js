@@ -27,6 +27,31 @@ function textMatcher(value) {
   return new RegExp(escaped, "i");
 }
 
+function standardTaskSort(sort) {
+  if (sort === "dueDesc") return { scheduledAt: -1, createdAt: -1, _id: -1 };
+  if (sort === "newest") return { createdAt: -1, _id: -1 };
+  return { scheduledAt: 1, createdAt: -1, _id: -1 };
+}
+
+function findSortedTasks(filter, sort, skip, limit) {
+  if (sort !== "activeNewest") {
+    return Task.find(filter).sort(standardTaskSort(sort)).skip(skip).limit(limit);
+  }
+
+  return Task.aggregate([
+    { $match: filter },
+    {
+      $set: {
+        sortStatus: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] },
+      },
+    },
+    { $sort: { sortStatus: 1, createdAt: -1, _id: -1 } },
+    { $skip: skip },
+    { $limit: limit },
+    { $unset: ["sortStatus", "__v"] },
+  ]);
+}
+
 export async function createTask(userId, input) {
   return Task.create({ ...taskPayload(input), user: userId });
 }
@@ -46,14 +71,8 @@ export async function listTasks(userId, query) {
     if (query.to) filter.scheduledAt.$lte = new Date(query.to);
   }
 
-  const sort =
-    query.sort === "dueDesc"
-      ? { scheduledAt: -1 }
-      : query.sort === "newest"
-        ? { createdAt: -1 }
-        : { scheduledAt: 1, createdAt: 1 };
   const [tasks, total] = await Promise.all([
-    Task.find(filter).sort(sort).skip(skip).limit(limit),
+    findSortedTasks(filter, query.sort, skip, limit),
     Task.countDocuments(filter),
   ]);
   return { tasks, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
@@ -90,7 +109,7 @@ export async function searchTasks(userId, keyword, query) {
   const matcher = textMatcher(keyword);
   const filter = { user: userId, $or: [{ title: matcher }, { description: matcher }] };
   const [tasks, total] = await Promise.all([
-    Task.find(filter).sort({ scheduledAt: 1 }).skip(skip).limit(limit),
+    findSortedTasks(filter, query.sort || "activeNewest", skip, limit),
     Task.countDocuments(filter),
   ]);
   return { tasks, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
